@@ -33,3 +33,57 @@ body { margin: 0; background: #f6f8fb; color: #1f2937; }
 .link { border: none; background: none; color: var(--brand); cursor: pointer; padding: 0; }
 .page-foot { display: flex; justify-content: space-between; margin-top: 8px; font-size: 12px; color: var(--muted); }
 .error-text { color: #b42318; }
+
+/* 除雪车回放复核 */
+.panel { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; margin-bottom: 14px; }
+.panel-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 10px; }
+.panel-head h3 { margin: 0; font-size: 15px; }
+.panel-hint { color: var(--muted); font-size: 12px; }
+.panel-actions { margin-top: 10px; display: flex; justify-content: flex-end; gap: 8px; }
+.replay-strip { border-left: 3px solid var(--brand); }
+.checkbox-item { display: flex; align-items: center; gap: 4px; }
+.checkbox-item input { width: auto; }
+.tag { display: inline-block; font-style: normal; font-size: 11px; padding: 1px 6px; border-radius: 10px; background: #eef2f7; color: #475569; margin-left: 4px; }
+.tag.warn { background: #fef3c7; color: #92400e; }
+.tag.ok { background: #dcfce7; color: #166534; }
+.issue-badge { color: #b42318; font-weight: 600; }
+.issue-badge small { display: block; font-weight: 400; color: var(--muted); font-size: 11px; }
+.ok-text { color: #166534; }
+.migration-result { font-size: 12px; color: #166534; align-self: center; }
+.row-snapshot { background: #f8fafc; color: var(--muted); }
+.row-done { color: var(--muted); }
+.error-banner { background: #fee4e2; border: 1px solid #fda29b; color: #b42318; border-radius: 6px; padding: 8px 12px; font-size: 13px; margin-bottom: 12px; }
+.snapshot-banner { background: #f1f5f9; border: 1px dashed #94a3b8; color: #475569; border-radius: 6px; padding: 8px 12px; font-size: 13px; margin-bottom: 12px; }
+
+.trip-card { border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; margin-bottom: 10px; background: #fbfdff; }
+.trip-card.trip-bad { border-color: #fda29b; background: #fff7f7; }
+.trip-card.trip-dup { opacity: 0.85; }
+.trip-card.trip-done { border-color: #86efac; background: #f6fef9; }
+.trip-card.trip-snapshot { background: #f8fafc; border-style: dashed; }
+.trip-head { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.trip-check input { width: auto; }
+.trip-title { font-weight: 600; }
+.trip-grid { display: flex; gap: 16px; margin-bottom: 8px; }
+.trip-field span { display: block; font-size: 12px; color: var(--muted); }
+.trip-field input { margin-top: 2px; }
+.trip-field b { font-size: 13px; }
+.track-row { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; margin: 6px 0; }
+.track-point { font-size: 12px; background: #e8f0fe; border: 1px solid #c3d8fb; border-radius: 4px; padding: 2px 6px; white-space: nowrap; }
+.track-point small { color: var(--muted); margin-left: 4px; }
+.track-point.filled { background: #fef9c3; border-color: #fde047; }
+.track-point.empty { background: #fee4e2; border-color: #fda29b; color: #b42318; }
+.track-line { width: 18px; height: 2px; background: #c3d8fb; }
+.issue-list { margin: 6px 0 0; padding-left: 18px; }
+.issue-list li { font-size: 12px; margin: 2px 0; }
+.issue-bad { color: #b42318; }
+.issue-dup { color: #92400e; }
+.issue-ok { font-size: 12px; color: #166534; margin-top: 4px; }
+.trip-actions { margin-top: 6px; text-align: right; }
+.batch-bar { justify-content: space-between; align-items: center; }
+.batch-meta { font-size: 12px; color: var(--muted); }
+.writeback-grid { display: flex; gap: 12px; }
+.writeback-grid > div { flex: 1; }
+.writeback-grid pre { background: #f8fafc; border: 1px solid var(--border); border-radius: 6px; padding: 8px; font-size: 12px; margin: 4px 0 0; white-space: pre-wrap; }
+.timeline-table input { width: 100%; }
+.btn:disabled { opacity: 0.55; cursor: not-allowed; }
+.link:disabled { opacity: 0.5; cursor: not-allowed; }

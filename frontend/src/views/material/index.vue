@@ -11,6 +11,37 @@
       </div>
     </header>
 
+    <!-- 物资工作台：除雪回放复核产生的融雪剂发料待办，整组重放后自动回写闭环 -->
+    <section class="panel">
+      <div class="panel-head">
+        <h3>物资工作台 · 除雪回放待办</h3>
+        <span class="panel-hint">修正结论整组提交后自动回写数量并闭环，无需手工改单</span>
+      </div>
+      <table class="data-table">
+        <thead>
+          <tr><th>作业编号</th><th>材料</th><th>应配数量</th><th>来源</th><th>状态</th><th>备注</th><th>作业</th></tr>
+        </thead>
+        <tbody>
+          <tr v-for="todo in replayTodos" :key="todo.id" :class="{ 'row-done': todo.status === '已回写' }">
+            <td>{{ todo.作业编号 }}</td>
+            <td>{{ todo.材料名称 }}</td>
+            <td>{{ todo.应配数量 }}</td>
+            <td>{{ todo.来源 }}</td>
+            <td>
+              <em class="tag" :class="todo.status === '待办' ? 'warn' : 'ok'">{{ todo.status }}</em>
+            </td>
+            <td>{{ todo.备注 }}</td>
+            <td class="row-actions">
+              <RouterLink class="link" :to="`/winter/replay/${todo.winter_id}`">查看回放复核</RouterLink>
+            </td>
+          </tr>
+          <tr v-if="!replayTodos.length">
+            <td colspan="7" class="empty-state">暂无除雪回放物资待办</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
     <div class="stat-row">
       <article v-for="item in stats" :key="item.label" class="stat-card">
         <span class="stat-label">{{ item.label }}</span>
@@ -81,6 +112,29 @@ const errorMessage = ref('')
 const filters = ref<Record<string, string>>({})
 const filterFields = columns.slice(0, 3)
 
+type ReplayTodo = {
+  id: number
+  winter_id: number
+  作业编号: string
+  材料名称: string
+  应配数量: string
+  status: string
+  来源: string
+  备注: string
+}
+const replayTodos = ref<ReplayTodo[]>([])
+
+async function reloadReplayTodos() {
+  try {
+    const response = await request('/api/material/todos')
+    if (!response.ok) return
+    const payload = await response.json()
+    replayTodos.value = payload.items ?? []
+  } catch {
+    // 工作台待办读不到时不影响材料台账主表
+  }
+}
+
 function resetFilters() {
   filters.value = {}
   void reload()
@@ -126,5 +180,8 @@ async function reload() {
   }
 }
 
-onMounted(reload)
+onMounted(() => {
+  void reload()
+  void reloadReplayTodos()
+})
 </script>

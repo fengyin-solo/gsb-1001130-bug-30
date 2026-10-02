@@ -28,6 +28,46 @@ class EntryPayload(BaseModel):
     remark: str | None = None
 
 
+class TimelineSegment(BaseModel):
+    """作业时间轴的一段路段窗口。"""
+
+    section: str
+    start: str
+    end: str
+
+
+class TimelineCalibratePayload(BaseModel):
+    """校准作业时间轴：expected_version 做乐观锁，timeline 是校准后的分段窗口。"""
+
+    expected_version: int
+    timeline: list[TimelineSegment] = Field(default_factory=list)
+
+
+class TripPoint(BaseModel):
+    """轨迹点：时间戳 + 桩号；空桩号由迁移流程按相邻轨迹补齐。"""
+
+    ts: str
+    stake: str = ""
+    stake_filled: bool = False
+
+
+class TripSupplementPayload(BaseModel):
+    """并发补录趟次：携带事件版本做乐观锁，补录不新造重复趟次。"""
+
+    expected_version: int
+    card_section: str | None = None
+    recorded_team: str | None = None
+    points: list[TripPoint] | None = None
+
+
+class ReplaySubmitPayload(BaseModel):
+    """批量重放整组提交：事件版本 + 回放游标双重绑定，trip_ids 为本次复核的趟次。"""
+
+    expected_version: int
+    expected_cursor: int | None = None
+    trip_ids: list[int] = Field(default_factory=list)
+
+
 
 class RoadSectionEntry(BaseModel):
     """管养路段明细结构。"""
