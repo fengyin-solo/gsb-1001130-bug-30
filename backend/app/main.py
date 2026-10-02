@@ -5,10 +5,12 @@
 """
 from __future__ import annotations
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
 from app.config import settings
+from app.replay import ReplayConflict, ReplayError
 from app.routers import ROUTERS
 from app.store import store
 
@@ -24,6 +26,17 @@ app.add_middleware(
 
 for module in ROUTERS:
     app.include_router(module.router)
+
+
+@app.exception_handler(ReplayConflict)
+def replay_conflict_handler(_: Request, exc: ReplayConflict) -> JSONResponse:
+    """乐观锁/事件版本冲突：调用方必须重新拉取数据后再提交。"""
+    return JSONResponse(status_code=409, content={"detail": str(exc)})
+
+
+@app.exception_handler(ReplayError)
+def replay_error_handler(_: Request, exc: ReplayError) -> JSONResponse:
+    return JSONResponse(status_code=400, content={"detail": str(exc)})
 
 
 @app.get("/api/health")

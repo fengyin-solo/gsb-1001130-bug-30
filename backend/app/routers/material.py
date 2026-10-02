@@ -6,6 +6,7 @@ from typing import Any
 from fastapi import APIRouter, HTTPException, Query
 
 from app.schemas import ActionResult, EntryPayload, PageResult
+from app.replay import ReplayError, replay_service
 from app.services.material import MaterialService
 
 router = APIRouter(prefix="/api/material", tags=["养护材料"])
@@ -28,6 +29,21 @@ def list_entries(
         raise HTTPException(status_code=400, detail="每页最多 200 条，请缩小分页范围")
     items, total = service.list_entries(keyword=keyword, status=status, page=page, size=size)
     return PageResult(items=items, total=total, page=page, size=size)
+
+
+@router.get("/todos")
+def list_material_todos() -> dict[str, Any]:
+    """物资工作台：除雪回放复核结论回写产生的物资待办（核销/补充融雪剂）。"""
+    return {"items": replay_service.material_todos()}
+
+
+@router.post("/todos/{todo_id}/resolve")
+def resolve_material_todo(todo_id: int) -> dict[str, Any]:
+    """物资工作台核销一条待办。"""
+    try:
+        return replay_service.resolve_todo(todo_id)
+    except ReplayError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
 
 
 @router.get("/{entry_id}", response_model=dict)

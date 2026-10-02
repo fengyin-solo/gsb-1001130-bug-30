@@ -59,6 +59,61 @@
       <span>共 {{ total }} 条养护材料记录</span>
       <span v-if="errorMessage" class="error-text">{{ errorMessage }}</span>
     </footer>
+
+    <section class="replay-panel">
+      <header class="page-head">
+        <div>
+          <h3>物资工作台 · 除雪回放待办</h3>
+          <p class="page-desc">除雪车回放复核结论一次提交后回写的融雪剂核销/补充待办。</p>
+        </div>
+        <div class="page-actions">
+          <button class="btn" type="button" @click="loadTodos">刷新待办</button>
+        </div>
+      </header>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>待办编号</th>
+            <th>关联作业</th>
+            <th>关联趟次</th>
+            <th>作业路段</th>
+            <th>责任组</th>
+            <th>待办内容</th>
+            <th>回放版本</th>
+            <th>状态</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="todo in todos" :key="String(todo.id)">
+            <td>{{ todo.id }}</td>
+            <td>{{ todo.关联作业 }}</td>
+            <td>{{ todo.关联趟次 }}</td>
+            <td>{{ todo.作业路段 ?? '—' }}</td>
+            <td>{{ todo.责任组 ?? '—' }}</td>
+            <td>{{ todo.待办内容 }}</td>
+            <td>{{ todo.回放版本 ?? '—' }}</td>
+            <td>
+              <span :class="['tag', todo.status === '已核销' ? 'tag-ok' : 'tag-danger']">{{ todo.status }}</span>
+            </td>
+            <td>
+              <button
+                v-if="todo.status === '待办'"
+                class="link"
+                type="button"
+                @click="resolveTodo(todo.id)"
+              >
+                核销
+              </button>
+              <span v-else>—</span>
+            </td>
+          </tr>
+          <tr v-if="!todos.length">
+            <td colspan="9" class="empty-state">暂无物资待办；在除雪作业详情完成复核提交后自动生成</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
   </section>
 </template>
 
@@ -66,8 +121,10 @@
 import { onMounted, ref } from 'vue'
 
 import { request } from '@/api/client'
+import { materialApi } from '@/api/replay'
 
 type Row = Record<string, string | number | null>
+type Todo = Record<string, any>
 
 const ENDPOINT = '/api/material'
 const columns = ["材料编号", "材料名称", "材料类别", "规格型号", "供应商", "进场日期", "存放地点", "材料状态"]
@@ -80,6 +137,27 @@ const total = ref(0)
 const errorMessage = ref('')
 const filters = ref<Record<string, string>>({})
 const filterFields = columns.slice(0, 3)
+
+const todos = ref<Todo[]>([])
+
+async function loadTodos() {
+  try {
+    const payload = await materialApi.todos()
+    todos.value = payload.items ?? []
+  } catch (error) {
+    errorMessage.value = error instanceof Error ? error.message : '物资待办读取失败'
+  }
+}
+
+async function resolveTodo(id: number) {
+  errorMessage.value = ''
+  try {
+    await materialApi.resolveTodo(id)
+    await loadTodos()
+  } catch (error) {
+    errorMessage.value = error instanceof Error ? error.message : '待办核销失败'
+  }
+}
 
 function resetFilters() {
   filters.value = {}
@@ -126,5 +204,14 @@ async function reload() {
   }
 }
 
-onMounted(reload)
+onMounted(() => {
+  void reload()
+  void loadTodos()
+})
 </script>
+
+<style scoped>
+.tag { display: inline-block; padding: 0.1rem 0.5rem; border-radius: 999px; font-size: 0.8rem; }
+.tag-ok { background: #e6f6ec; color: #1a7f37; }
+.tag-danger { background: #fdecea; color: #c0392b; }
+</style>
